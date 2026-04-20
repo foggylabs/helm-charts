@@ -35,9 +35,9 @@ Help:  support@foggyhq.com
 
 {{- if .Values.postgresql.enabled }}
 
-────────────────────────────────────────────────────────────
- ⚠  Bundled PostgreSQL is enabled (evaluation only).
-    For production use, set `postgresql.enabled: false` and
-    point `externalDatabase.url` at a managed Postgres.
-────────────────────────────────────────────────────────────
+------------------------------------------------------------
+ NOTE: Bundled PostgreSQL is enabled (evaluation only).
+ For production use, set `postgresql.enabled: false` and
+ point `externalDatabase.url` at a managed Postgres.
+------------------------------------------------------------
 {{- end }}
