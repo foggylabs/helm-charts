@@ -1,0 +1,74 @@
+{{- /*
+ClusterRole / Role that grants the Agent pod read-only access to the
+Kubernetes API so it can investigate incidents.
+
+See docs.foggyhq.com/self-hosted/rbac for the full permission table.
+
+- `rbac.enabled: false`            → no role is created.
+- `rbac.customClusterRoleName`     → no role is created; the binding below
+                                     references the pre-existing role instead.
+- `rbac.scope: cluster` (default)  → cluster-wide ClusterRole.
+- `rbac.scope: namespace`          → one Role per namespace listed in
+                                     `rbac.namespaces`.
+*/}}
+{{- if and .Values.rbac.enabled (not .Values.rbac.customClusterRoleName) }}
+{{- if eq .Values.rbac.scope "cluster" }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "foggy.clusterRoleName" . }}
+  labels:
+    {{- include "foggy.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources:
+      - pods
+      - events
+      - services
+      - endpoints
+      - configmaps
+      - nodes
+      - namespaces
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get", "list"]
+  - apiGroups: ["apps"]
+    resources:
+      - deployments
+      - replicasets
+      - statefulsets
+      - daemonsets
+    verbs: ["get", "list", "watch"]
+{{- else if eq .Values.rbac.scope "namespace" }}
+{{- range .Values.rbac.namespaces }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "foggy.clusterRoleName" $ }}
+  namespace: {{ . }}
+  labels:
+    {{- include "foggy.labels" $ | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources:
+      - pods
+      - events
+      - services
+      - endpoints
+      - configmaps
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get", "list"]
+  - apiGroups: ["apps"]
+    resources:
+      - deployments
+      - replicasets
+      - statefulsets
+      - daemonsets
+    verbs: ["get", "list", "watch"]
+{{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,42 @@
+{{- /*
+Binds the Agent's ServiceAccount to the read-only role defined in
+clusterrole.yaml. If `rbac.customClusterRoleName` is set, the binding targets
+that external ClusterRole; the chart does not create the role itself.
+*/}}
+{{- if .Values.rbac.enabled }}
+{{- if eq .Values.rbac.scope "cluster" }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "foggy.fullname" . }}-readonly
+  labels:
+    {{- include "foggy.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "foggy.clusterRoleName" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "foggy.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+{{- else if eq .Values.rbac.scope "namespace" }}
+{{- range .Values.rbac.namespaces }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "foggy.fullname" $ }}-readonly
+  namespace: {{ . }}
+  labels:
+    {{- include "foggy.labels" $ | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "foggy.clusterRoleName" $ }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "foggy.serviceAccountName" $ }}
+    namespace: {{ $.Release.Namespace }}
+{{- end }}
+{{- end }}
+{{- end }}

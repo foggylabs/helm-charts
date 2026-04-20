@@ -1,0 +1,27 @@
+apiVersion: v2
+name: foggy
+description: Foggy — self-hosted AI-native observability for incident investigation
+type: application
+version: 0.1.0
+appVersion: "v0.1.0"
+kubeVersion: ">=1.27.0-0"
+home: https://foggyhq.com
+sources:
+  - https://github.com/foggylabs/helm-charts
+icon: https://foggyhq.com/favicon.png
+maintainers:
+  - name: Foggy Labs
+    email: support@foggyhq.com
+    url: https://foggyhq.com
+keywords:
+  - observability
+  - incident-response
+  - ai
+  - kubernetes
+  - sre
+dependencies:
+  - name: postgresql
+    version: "16.2.3"
+    repository: "oci://registry-1.docker.io/bitnamicharts"
+    condition: postgresql.enabled
+    alias: postgresql

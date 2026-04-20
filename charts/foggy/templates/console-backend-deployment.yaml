@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "foggy.fullname" . }}-console-backend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "foggy.labels" . | nindent 4 }}
+    app.kubernetes.io/component: console-backend
+spec:
+  replicas: {{ .Values.consoleBackend.replicas }}
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      {{- include "foggy.componentSelectorLabels" (dict "ctx" . "component" "console-backend") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "foggy.componentSelectorLabels" (dict "ctx" . "component" "console-backend") | nindent 8 }}
+      {{- with .Values.consoleBackend.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.global.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: console-backend
+          image: {{ include "foggy.image" (dict "ctx" . "image" .Values.consoleBackend.image) }}
+          imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8001
+              protocol: TCP
+          env:
+            - name: AGENT_URL
+              value: http://{{ include "foggy.fullname" . }}-agent:{{ .Values.agent.service.port }}
+            - name: OTEL_SERVICE_NAME
+              value: foggy-console-backend
+            - name: LOG_LEVEL
+              value: INFO
+            {{- if .Values.postgresql.enabled }}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-postgresql
+                  key: password
+            - name: DATABASE_URL
+              value: {{ include "foggy.databaseUrl" . | quote }}
+            {{- else if .Values.externalDatabase.existingSecret }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.externalDatabase.existingSecret }}
+                  key: {{ .Values.externalDatabase.existingSecretKey }}
+            {{- else }}
+            - name: DATABASE_URL
+              value: {{ .Values.externalDatabase.url | quote }}
+            {{- end }}
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "foggy.secretName" . }}
+                  key: JWT_SECRET
+            - name: AGENT_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "foggy.secretName" . }}
+                  key: AGENT_API_TOKEN
+            - name: CONNECTOR_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "foggy.secretName" . }}
+                  key: CONNECTOR_ENCRYPTION_KEY
+            - name: FOGGY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "foggy.adminSecretName" . }}
+                  key: password
+            {{- with .Values.consoleBackend.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          resources:
+            {{- toYaml .Values.consoleBackend.resources | nindent 12 }}
+      {{- with .Values.consoleBackend.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.consoleBackend.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.consoleBackend.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

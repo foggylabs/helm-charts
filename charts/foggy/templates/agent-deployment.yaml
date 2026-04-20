@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "foggy.fullname" . }}-agent
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "foggy.labels" . | nindent 4 }}
+    app.kubernetes.io/component: agent
+spec:
+  replicas: {{ .Values.agent.replicas }}
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      {{- include "foggy.componentSelectorLabels" (dict "ctx" . "component" "agent") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "foggy.componentSelectorLabels" (dict "ctx" . "component" "agent") | nindent 8 }}
+      {{- with .Values.agent.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "foggy.serviceAccountName" . }}
+      {{- with .Values.global.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: agent
+          image: {{ include "foggy.image" (dict "ctx" . "image" .Values.agent.image) }}
+          imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          env:
+            - name: AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "foggy.secretName" . }}
+                  key: AGENT_API_TOKEN
+            - name: OTEL_SERVICE_NAME
+              value: foggy-agent
+            - name: LOG_LEVEL
+              value: INFO
+            {{- with .Values.agent.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+            {{- toYaml .Values.agent.resources | nindent 12 }}
+      {{- with .Values.agent.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.agent.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.agent.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

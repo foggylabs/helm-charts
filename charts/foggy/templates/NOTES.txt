@@ -1,0 +1,43 @@
+Thanks for installing {{ .Chart.Name }} v{{ .Chart.AppVersion }}.
+
+Finish setup in four steps:
+
+1. Retrieve the temporary admin password generated during install:
+
+     kubectl get secret {{ include "foggy.adminSecretName" . }} -n {{ .Release.Namespace }} \
+       -o jsonpath='{.data.password}' | base64 -d ; echo
+
+{{- if .Values.ingress.enabled }}
+
+2. Access the Foggy Console at:
+
+     http{{ if .Values.ingress.tls.enabled }}s{{ end }}://{{ .Values.ingress.host }}
+{{- else }}
+
+2. Port-forward the Console Service to your local machine:
+
+     kubectl port-forward -n {{ .Release.Namespace }} svc/{{ .Release.Name }}-console 8080:{{ .Values.consoleFrontend.service.port }}
+
+   Then open http://localhost:8080 in your browser.
+{{- end }}
+
+3. Log in with `admin` and the temporary password from step 1. Foggy will walk
+   you through:
+     - Change password + set admin email
+     - Activate your license (paste the JWT you received at signup)
+     - Configure your LLM provider (Anthropic API key)
+
+4. Connect your first data source on the Waiting-for-Data screen.
+
+Docs:  https://docs.foggyhq.com/self-hosted/getting-started
+RBAC:  https://docs.foggyhq.com/self-hosted/rbac
+Help:  support@foggyhq.com
+
+{{- if .Values.postgresql.enabled }}
+
+────────────────────────────────────────────────────────────
+ ⚠  Bundled PostgreSQL is enabled (evaluation only).
+    For production use, set `postgresql.enabled: false` and
+    point `externalDatabase.url` at a managed Postgres.
+────────────────────────────────────────────────────────────
+{{- end }}

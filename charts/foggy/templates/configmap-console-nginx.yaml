@@ -1,0 +1,66 @@
+{{- /*
+Nginx config mounted into the console-frontend pod. Proxies /api and /admin
+to the console-backend Service so the frontend's same-origin relative URLs
+(`fetch("/api/...")`) work, matching the Cloud deployment's Traefik routing.
+
+Without this, customers who `kubectl port-forward` to the frontend Service
+would get 404s on every API call.
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "foggy.fullname" . }}-console-nginx
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "foggy.labels" . | nindent 4 }}
+    app.kubernetes.io/component: console-frontend
+data:
+  default.conf: |
+    upstream foggy_backend {
+        server {{ include "foggy.fullname" . }}-console-backend:{{ .Values.consoleBackend.service.port }};
+    }
+
+    server {
+        listen 3000;
+        server_name _;
+        root /usr/share/nginx/html;
+        index index.html;
+
+        client_max_body_size 10M;
+
+        gzip on;
+        gzip_types text/plain text/css application/json application/javascript text/xml application/xml text/javascript image/svg+xml;
+        gzip_min_length 256;
+
+        # Same-origin API + admin routing — proxy to the backend Service.
+        location /api/ {
+            proxy_pass http://foggy_backend/api/;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            # Long-lived SSE streams for investigation events.
+            proxy_buffering off;
+            proxy_read_timeout 3600s;
+        }
+
+        location /admin/ {
+            proxy_pass http://foggy_backend/admin/;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+            try_files $uri =404;
+        }
+
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+    }

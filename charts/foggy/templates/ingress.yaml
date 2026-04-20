@@ -1,0 +1,59 @@
+{{- /*
+Optional Ingress for exposing Foggy to your team. Disabled by default — first
+install uses `kubectl port-forward`. Enable for production:
+
+  helm upgrade foggy foggy/foggy --namespace foggy \
+    --set ingress.enabled=true \
+    --set ingress.host=foggy.your-company.com
+
+The Ingress routes all paths to the console Service; nginx inside that pod
+handles the /api and /admin proxy to the backend (see configmap-console-nginx).
+*/}}
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "foggy.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "foggy.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- if .Values.ingress.tls.enabled }}
+  tls:
+    - hosts:
+        - {{ required "ingress.host is required when ingress.tls.enabled=true" .Values.ingress.host | quote }}
+      {{- with .Values.ingress.tls.secretName }}
+      secretName: {{ . }}
+      {{- end }}
+  {{- end }}
+  rules:
+    - host: {{ required "ingress.host is required when ingress.enabled=true" .Values.ingress.host | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-console
+                port:
+                  number: {{ .Values.consoleFrontend.service.port }}
+    {{- range .Values.ingress.extraHosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          - path: {{ .path | default "/" }}
+            pathType: {{ .pathType | default "Prefix" }}
+            backend:
+              service:
+                name: {{ $.Release.Name }}-console
+                port:
+                  number: {{ $.Values.consoleFrontend.service.port }}
+    {{- end }}
+{{- end }}

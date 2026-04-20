@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "foggy.fullname" . }}-console-backend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "foggy.labels" . | nindent 4 }}
+    app.kubernetes.io/component: console-backend
+spec:
+  type: {{ .Values.consoleBackend.service.type }}
+  ports:
+    - name: http
+      port: {{ .Values.consoleBackend.service.port }}
+      targetPort: http
+      protocol: TCP
+  selector:
+    {{- include "foggy.componentSelectorLabels" (dict "ctx" . "component" "console-backend") | nindent 4 }}

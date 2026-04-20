@@ -1,0 +1,177 @@
+# Default values for Foggy.
+# Full reference: https://docs.foggyhq.com/self-hosted/getting-started
+
+# -- Global image overrides. Individual services inherit from these when their
+# -- own `image.repository` / `image.tag` are unset.
+global:
+  image:
+    registry: ghcr.io
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+
+# =============================================================================
+# Foggy Agent (investigation engine — calls LLM, runs kubectl/toolsets)
+# =============================================================================
+agent:
+  image:
+    repository: foggylabs/foggy-agent
+    tag: ""  # defaults to chart appVersion
+  replicas: 1
+  service:
+    type: ClusterIP
+    port: 8000
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      memory: 2Gi
+  extraEnv: []
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# =============================================================================
+# Foggy Console Backend (API, sessions, connector config, migrations)
+# =============================================================================
+consoleBackend:
+  image:
+    repository: foggylabs/foggy-console-backend
+    tag: ""  # defaults to chart appVersion
+  replicas: 1
+  service:
+    type: ClusterIP
+    port: 8001
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+  extraEnv: []
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# =============================================================================
+# Foggy Console Frontend (static React UI served by nginx)
+# =============================================================================
+consoleFrontend:
+  image:
+    repository: foggylabs/foggy-console-frontend
+    tag: ""  # defaults to chart appVersion
+  replicas: 1
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 3000
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      memory: 256Mi
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# =============================================================================
+# Kubernetes RBAC — default: cluster-wide read-only for the Agent pod.
+# See https://docs.foggyhq.com/self-hosted/rbac for the full permission list.
+# =============================================================================
+rbac:
+  # When true (default) the chart creates ServiceAccount + ClusterRole +
+  # ClusterRoleBinding so the Agent can query pods, events, logs, etc.
+  enabled: true
+  # Set to "namespace" to narrow Foggy's access from cluster-wide to a specific
+  # list of namespaces (a Role + RoleBinding is created per namespace instead
+  # of a ClusterRole + ClusterRoleBinding).
+  scope: cluster  # cluster | namespace
+  namespaces: []
+  # If set, the chart creates the RoleBinding only and expects the named
+  # ClusterRole to already exist in the cluster.
+  customClusterRoleName: ""
+
+# =============================================================================
+# Admin bootstrap (auto-generated password on first install)
+# =============================================================================
+admin:
+  # When true (default) the chart generates a random admin password on install
+  # and stores it in the `foggy-admin` Secret. The admin user must change it on
+  # first login. See `self-hosted/getting-started` § Access the UI.
+  generatePassword: true
+  # If you prefer to supply the initial admin password yourself (e.g. from
+  # your secret manager via an external-secrets operator), set
+  # `admin.generatePassword: false` and create the `foggy-admin` Secret
+  # out-of-band with a `password` key before `helm install`.
+  existingSecret: ""
+
+# =============================================================================
+# PostgreSQL
+# =============================================================================
+# Two modes:
+#  - `postgresql.enabled: true`  → bundled Bitnami Postgres subchart (EVAL ONLY).
+#  - `postgresql.enabled: false` → you bring an external Postgres;
+#                                  set `externalDatabase.url`.
+#
+# For any production / paid-trial use, prefer an external managed Postgres
+# (AWS RDS, Cloud SQL, Azure Database, CloudNativePG). Bundled mode runs a
+# single in-cluster pod with no HA and no automated backups.
+postgresql:
+  enabled: true
+  auth:
+    username: foggy
+    database: foggy
+    # Leave password empty to auto-generate. The bundled subchart stores the
+    # generated value in the Postgres subchart's own Secret, which the Foggy
+    # backend reads via env var (see `console-deployment.yaml`).
+    password: ""
+    postgresPassword: ""
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+
+externalDatabase:
+  # Full async-postgres URL. Example:
+  #   postgresql+asyncpg://foggy:pass@db.your-company.com:5432/foggy
+  # Either set `url` directly or reference an existing Secret.
+  url: ""
+  existingSecret: ""
+  existingSecretKey: "url"
+
+# =============================================================================
+# Ingress (disabled by default — use `kubectl port-forward` for first install)
+# =============================================================================
+ingress:
+  enabled: false
+  className: ""
+  host: ""  # e.g. foggy.your-company.com
+  annotations: {}
+  tls:
+    enabled: false
+    secretName: ""
+  # Optional extra hosts / paths for advanced routing (uncommon).
+  extraHosts: []
+
+# =============================================================================
+# Service account (used by the Agent pod to authenticate to the Kubernetes API)
+# =============================================================================
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+# =============================================================================
+# Application-level secrets (auto-generated on first install; you can override
+# by pointing `existingSecret` at a pre-created Secret with the same keys).
+# =============================================================================
+secrets:
+  existingSecret: ""
+  # Keys the chart expects in the Secret:
+  #   JWT_SECRET                  — user session signing
+  #   AGENT_API_TOKEN             — console <-> agent shared secret
+  #   CONNECTOR_ENCRYPTION_KEY    — Fernet key for connector credentials at rest
