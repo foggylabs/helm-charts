@@ -10,9 +10,9 @@ sources:
   - https://github.com/foggylabs/helm-charts
 icon: https://foggyhq.com/favicon.png
 maintainers:
-  - name: Foggy Labs
+  - name: foggylabs
     email: support@foggyhq.com
-    url: https://foggyhq.com
+    url: https://github.com/foggylabs
 keywords:
   - observability
   - incident-response
