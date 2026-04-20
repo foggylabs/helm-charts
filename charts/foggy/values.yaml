@@ -127,6 +127,13 @@ admin:
 # single in-cluster pod with no HA and no automated backups.
 postgresql:
   enabled: true
+  # Bitnami moved their free public Postgres images to the `bitnamilegacy`
+  # namespace on Docker Hub in mid-2025; the subchart still defaults to the
+  # old `bitnami/postgresql` path, which now returns 404 for every tag. Pin
+  # to the legacy repo so `helm install` actually pulls. When (if) we move
+  # to a non-Bitnami subchart, drop this override.
+  image:
+    repository: bitnamilegacy/postgresql
   auth:
     username: foggy
     database: foggy
