@@ -3,6 +3,37 @@ entries:
   foggy:
   - apiVersion: v2
     appVersion: v0.1.0
+    created: "2026-04-20T11:58:33.274346603Z"
+    dependencies:
+    - alias: postgresql
+      condition: postgresql.enabled
+      name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 16.2.3
+    description: Foggy - self-hosted AI-native observability for incident investigation
+    digest: f1820f245bd58f07b70c00aa0abc5d00fa9d843e0d5d9fb96da4d786c21343c7
+    home: https://foggyhq.com
+    icon: https://foggyhq.com/favicon.png
+    keywords:
+    - observability
+    - incident-response
+    - ai
+    - kubernetes
+    - sre
+    kubeVersion: '>=1.27.0-0'
+    maintainers:
+    - email: support@foggyhq.com
+      name: foggylabs
+      url: https://github.com/foggylabs
+    name: foggy
+    sources:
+    - https://github.com/foggylabs/helm-charts
+    type: application
+    urls:
+    - https://github.com/foggylabs/helm-charts/releases/download/foggy-0.1.3/foggy-0.1.3.tgz
+    version: 0.1.3
+  - apiVersion: v2
+    appVersion: v0.1.0
     created: "2026-04-20T10:37:53.583639135Z"
     dependencies:
     - alias: postgresql
@@ -63,4 +94,4 @@ entries:
     urls:
     - https://github.com/foggylabs/helm-charts/releases/download/foggy-0.1.0/foggy-0.1.0.tgz
     version: 0.1.0
-generated: "2026-04-20T10:37:53.583652391Z"
+generated: "2026-04-20T11:58:33.274358825Z"
