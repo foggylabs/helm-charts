@@ -79,20 +79,25 @@ consoleFrontend:
   affinity: {}
 
 # =============================================================================
-# Kubernetes RBAC — default: cluster-wide read-only for the Agent pod.
+# Kubernetes RBAC - default: cluster-wide read-only for the Agent pod.
 # See https://docs.foggyhq.com/self-hosted/rbac for the full permission list.
 # =============================================================================
 rbac:
-  # When true (default) the chart creates ServiceAccount + ClusterRole +
-  # ClusterRoleBinding so the Agent can query pods, events, logs, etc.
+  # When true (default) the chart creates ClusterRole/Role + binding so the
+  # Agent can query pods, events, logs, etc. When false the chart creates no
+  # RBAC at all, and `customClusterRoleName` below is ignored - to bring your
+  # own role, set `enabled: true` AND `customClusterRoleName: <role>`.
   enabled: true
   # Set to "namespace" to narrow Foggy's access from cluster-wide to a specific
   # list of namespaces (a Role + RoleBinding is created per namespace instead
   # of a ClusterRole + ClusterRoleBinding).
   scope: cluster  # cluster | namespace
   namespaces: []
-  # If set, the chart creates the RoleBinding only and expects the named
-  # ClusterRole to already exist in the cluster.
+  # If set, the chart creates the binding only and expects the named ClusterRole
+  # to already exist in the cluster. Requires `rbac.scope: cluster` - combining
+  # with `rbac.scope: namespace` is unsupported and fails at install time with
+  # a clear message (a RoleBinding cannot safely reference an arbitrary
+  # ClusterRole by name alone).
   customClusterRoleName: ""
 
 # =============================================================================
