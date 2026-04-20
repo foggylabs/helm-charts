@@ -2,7 +2,7 @@ apiVersion: v2
 name: foggy
 description: Foggy - self-hosted AI-native observability for incident investigation
 type: application
-version: 0.1.1
+version: 0.1.3
 appVersion: "v0.1.0"
 kubeVersion: ">=1.27.0-0"
 home: https://foggyhq.com
@@ -10,9 +10,9 @@ sources:
   - https://github.com/foggylabs/helm-charts
 icon: https://foggyhq.com/favicon.png
 maintainers:
-  - name: Foggy Labs
+  - name: foggylabs
     email: support@foggyhq.com
-    url: https://foggyhq.com
+    url: https://github.com/foggylabs
 keywords:
   - observability
   - incident-response

@@ -2,7 +2,18 @@
 Binds the Agent's ServiceAccount to the read-only role defined in
 clusterrole.yaml. If `rbac.customClusterRoleName` is set, the binding targets
 that external ClusterRole; the chart does not create the role itself.
+
+Unsupported combination: `rbac.scope=namespace` + `rbac.customClusterRoleName`.
+A RoleBinding cannot reference a cluster-scoped role under the same name as
+a namespace-scoped one, and the chart has no way to know whether the custom
+role is actually cluster-scoped or namespace-scoped. Fail loudly rather than
+emit a silently-broken RoleBinding.
 */}}
+{{- if and .Values.rbac.enabled
+           (eq .Values.rbac.scope "namespace")
+           .Values.rbac.customClusterRoleName }}
+{{- fail "rbac.customClusterRoleName is not supported with rbac.scope=namespace. Either switch to rbac.scope=cluster, or unset rbac.customClusterRoleName and let the chart create per-namespace Roles." }}
+{{- end }}
 {{- if .Values.rbac.enabled }}
 {{- if eq .Values.rbac.scope "cluster" }}
 apiVersion: rbac.authorization.k8s.io/v1
