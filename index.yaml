@@ -3,6 +3,41 @@ entries:
   foggy:
   - annotations:
       artifacthub.io/changes: |
+        - kind: changed
+          description: "appVersion bumped v0.2.4 → v0.2.5 — picks up multi-arch (linux/amd64 + linux/arm64) Foggy images. No chart template changes; existing deployments can upgrade transparently."
+    apiVersion: v2
+    appVersion: v0.2.5
+    created: "2026-04-21T09:37:38.39320392Z"
+    dependencies:
+    - alias: postgresql
+      condition: postgresql.enabled
+      name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 16.2.3
+    description: Foggy - self-hosted AI-native observability for incident investigation
+    digest: cde4d350b41b36601f096da2525c942115d75573371185bd3812f1f514222196
+    home: https://foggyhq.com
+    icon: https://foggyhq.com/favicon.png
+    keywords:
+    - observability
+    - incident-response
+    - ai
+    - kubernetes
+    - sre
+    kubeVersion: '>=1.27.0-0'
+    maintainers:
+    - email: support@foggyhq.com
+      name: foggylabs
+      url: https://github.com/foggylabs
+    name: foggy
+    sources:
+    - https://github.com/foggylabs/helm-charts
+    type: application
+    urls:
+    - https://github.com/foggylabs/helm-charts/releases/download/foggy-0.2.1/foggy-0.2.1.tgz
+    version: 0.2.1
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: "Self-hosted license activation flow — first-login admin bootstrap, license JWT paste on /license-activate, license status card in Settings"
         - kind: added
@@ -137,4 +172,4 @@ entries:
     urls:
     - https://github.com/foggylabs/helm-charts/releases/download/foggy-0.1.0/foggy-0.1.0.tgz
     version: 0.1.0
-generated: "2026-04-21T08:53:02.310239862Z"
+generated: "2026-04-21T09:37:38.393228667Z"
