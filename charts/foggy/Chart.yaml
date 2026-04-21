@@ -3,7 +3,7 @@ name: foggy
 description: Foggy - self-hosted AI-native observability for incident investigation
 type: application
 version: 0.2.0
-appVersion: "v0.2.3"
+appVersion: "v0.2.4"
 kubeVersion: ">=1.27.0-0"
 home: https://foggyhq.com
 sources:
@@ -26,9 +26,9 @@ annotations:
     - kind: added
       description: "ENABLE_ADMIN_PANEL and SEED_DEMO_PROJECT env flags wired into console-backend deployment (both default false in self-hosted mode)"
     - kind: changed
-      description: "appVersion bumped v0.1.0 → v0.2.3 — tracks Foggy v0.2.3 release (security-hardened, pre-release audit complete, entrypoint respects sslmode in DATABASE_URL)"
+      description: "appVersion bumped v0.1.0 → v0.2.4 — tracks Foggy v0.2.4 release (security-hardened, pre-release audit complete, entrypoint respects sslmode in DATABASE_URL, asyncpg driver respects sslmode translation)"
     - kind: security
-      description: "Chart now deploys Foggy images with Ed25519 license enforcement, OWASP nginx security headers, CORS default tightened to localhost:3000, and OpenVEX-documented non-reachable CVEs — see foggy repo CHANGELOG [0.2.0] through [0.2.3]"
+      description: "Chart now deploys Foggy images with Ed25519 license enforcement, OWASP nginx security headers, CORS default tightened to localhost:3000, and OpenVEX-documented non-reachable CVEs — see foggy repo CHANGELOG [0.2.0] through [0.2.4]"
     - kind: fixed
       description: "DATABASE_URL for the bundled PostgreSQL subchart now appends ?sslmode=disable since Bitnami Postgres has TLS off by default. External Postgres deployments (externalDatabase.url) are unaffected — operator controls sslmode directly."
 dependencies:
