@@ -2,7 +2,7 @@ apiVersion: v2
 name: foggy
 description: Foggy - self-hosted AI-native observability for incident investigation
 type: application
-version: 0.2.3
+version: 0.2.4
 appVersion: "v0.2.7"
 kubeVersion: ">=1.27.0-0"
 home: https://foggyhq.com
@@ -22,7 +22,11 @@ keywords:
 annotations:
   artifacthub.io/changes: |
     - kind: fixed
-      description: "appVersion bumped v0.2.6 → v0.2.7 — completes the duplicate-migration fix. v0.2.6 made the SQL a no-op but dbmate still crashed on schema_migrations primary-key collision (both files shared timestamp 20260401120000). v0.2.7 renames the duplicate to 20260401120001 so dbmate records a distinct row. Fresh installs now apply cleanly and end up with the full alert-webhook schema (alert_events + webhook_tokens)."
+      description: "console-backend now waits for Postgres before starting (initContainer, gated on postgresql.enabled=true). Fresh installs previously showed 4-5 CrashLoopBackOff cycles while backend retried TCP connections to a still-initializing Postgres pod. Recovery was eventual but looked broken in kubectl, and helm install --wait --timeout 5m could give up before self-healing completed."
+    - kind: fixed
+      description: "NOTES.txt no longer double-prefixes appVersion — was `vv0.2.7`, now `v0.2.7`. Cosmetic but confusing for customers seeing post-install output for the first time."
+    - kind: fixed
+      description: "Repo README chart version table updated from stale 0.1.3 / v0.1.0 to 0.2.4 / v0.2.7. RBAC summary sentence also corrected to list all 12 core resources actually granted (endpoints, configmaps, replicasets, statefulsets, daemonsets were missing from the prior wording). No permission changes — the cluster role itself is unchanged; only the README description was incomplete."
 dependencies:
   - name: postgresql
     version: "16.2.3"
