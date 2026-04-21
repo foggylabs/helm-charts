@@ -42,21 +42,10 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
         run: ct lint --target-branch "${{ github.event.repository.default_branch }}" --config ct.yaml
 
-      # TODO(foggy): re-enable `ct install` once the foggy-{agent,console-backend,console-frontend}
-      # container packages on ghcr.io are flipped to public visibility. Today they are private
-      # (the Foggy app does not yet enforce a license JWT, so public images + no license gate
-      # would let anyone run the product for free). `ct install` spins up kind and tries to pull
-      # the images anonymously, which 401s.
-      #
-      # Re-enable by restoring these steps AFTER:
-      #   (a) `app/agent/app/license/...` implements offline Ed25519 JWT verification, AND
-      #   (b) `ghcr.io/foggylabs/foggy-{agent,console-backend,console-frontend}` visibility is
-      #        flipped to public (manual GitHub UI action per package).
-      #
-      #   - name: Create kind cluster
-      #     if: steps.list-changed.outputs.changed == 'true'
-      #     uses: helm/kind-action@v1.10.0
-      #
-      #   - name: Run chart-testing (install)
-      #     if: steps.list-changed.outputs.changed == 'true'
-      #     run: ct install --target-branch "${{ github.event.repository.default_branch }}" --config ct.yaml
+      - name: Create kind cluster
+        if: steps.list-changed.outputs.changed == 'true'
+        uses: helm/kind-action@v1.10.0
+
+      - name: Run chart-testing (install)
+        if: steps.list-changed.outputs.changed == 'true'
+        run: ct install --target-branch "${{ github.event.repository.default_branch }}" --config ct.yaml
