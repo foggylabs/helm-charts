@@ -2,8 +2,8 @@ apiVersion: v2
 name: foggy
 description: Foggy - self-hosted AI-native observability for incident investigation
 type: application
-version: 0.2.2
-appVersion: "v0.2.6"
+version: 0.2.3
+appVersion: "v0.2.7"
 kubeVersion: ">=1.27.0-0"
 home: https://foggyhq.com
 sources:
@@ -22,7 +22,7 @@ keywords:
 annotations:
   artifacthub.io/changes: |
     - kind: fixed
-      description: "appVersion bumped v0.2.5 → v0.2.6 — fresh self-hosted installs no longer crash on duplicate migration `create_webhook_tokens`. The duplicate is now a no-op; alert-webhooks feature schema (alert_events + webhook_tokens tables) is created correctly. Existing installs unaffected."
+      description: "appVersion bumped v0.2.6 → v0.2.7 — completes the duplicate-migration fix. v0.2.6 made the SQL a no-op but dbmate still crashed on schema_migrations primary-key collision (both files shared timestamp 20260401120000). v0.2.7 renames the duplicate to 20260401120001 so dbmate records a distinct row. Fresh installs now apply cleanly and end up with the full alert-webhook schema (alert_events + webhook_tokens)."
 dependencies:
   - name: postgresql
     version: "16.2.3"
