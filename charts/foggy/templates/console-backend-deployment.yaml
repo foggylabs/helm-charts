@@ -26,6 +26,35 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.postgresql.enabled }}
+      # BL-99: fresh-install race guard. Without this, console-backend
+      # starts before the bundled Bitnami postgres pod is accepting
+      # connections and hits 4-5 CrashLoopBackOff cycles while asyncpg
+      # retries. K8s eventually converges, but the intermediate state
+      # looks broken and `helm install --wait --timeout 5m` can give up
+      # before self-healing completes. Pattern (busybox + nc -z) matches
+      # Bitnami / Grafana / Linkerd helm charts.
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox:1.36
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z {{ .Release.Name }}-postgresql 5432; do
+                echo "waiting for {{ .Release.Name }}-postgresql:5432 to accept connections..."
+                sleep 2
+              done
+              echo "postgres is ready."
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+      {{- end }}
       containers:
         - name: console-backend
           image: {{ include "foggy.image" (dict "ctx" . "image" .Values.consoleBackend.image) }}
