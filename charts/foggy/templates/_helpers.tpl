@@ -125,7 +125,13 @@ SQLAlchemy engine expects; the backend entrypoint rewrites it to plain
 {{- $host := printf "%s-postgresql" .Release.Name -}}
 {{- $user := .Values.postgresql.auth.username -}}
 {{- $db := .Values.postgresql.auth.database -}}
-{{- printf "postgresql+asyncpg://%s:$(POSTGRES_PASSWORD)@%s:5432/%s" $user $host $db -}}
+{{- /* Bundled Bitnami PostgreSQL subchart does not enable TLS by default,
+   so we explicitly set sslmode=disable here. The foggy-console-backend
+   entrypoint (v0.2.3+) respects any sslmode already in DATABASE_URL and
+   only defaults to sslmode=require when none is specified. Operators
+   supplying their own Postgres via externalDatabase.url keep full control
+   over sslmode — nothing here interferes with that branch. */ -}}
+{{- printf "postgresql+asyncpg://%s:$(POSTGRES_PASSWORD)@%s:5432/%s?sslmode=disable" $user $host $db -}}
 {{- else -}}
 {{- .Values.externalDatabase.url -}}
 {{- end -}}
