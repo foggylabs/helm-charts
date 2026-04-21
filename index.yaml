@@ -1,6 +1,49 @@
 apiVersion: v1
 entries:
   foggy:
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
+          description: "Self-hosted license activation flow — first-login admin bootstrap, license JWT paste on /license-activate, license status card in Settings"
+        - kind: added
+          description: "ENABLE_ADMIN_PANEL and SEED_DEMO_PROJECT env flags wired into console-backend deployment (both default false in self-hosted mode)"
+        - kind: changed
+          description: "appVersion bumped v0.1.0 → v0.2.4 — tracks Foggy v0.2.4 release (security-hardened, pre-release audit complete, entrypoint respects sslmode in DATABASE_URL, asyncpg driver respects sslmode translation)"
+        - kind: security
+          description: "Chart now deploys Foggy images with Ed25519 license enforcement, OWASP nginx security headers, CORS default tightened to localhost:3000, and OpenVEX-documented non-reachable CVEs — see foggy repo CHANGELOG [0.2.0] through [0.2.4]"
+        - kind: fixed
+          description: "DATABASE_URL for the bundled PostgreSQL subchart now appends ?sslmode=disable since Bitnami Postgres has TLS off by default. External Postgres deployments (externalDatabase.url) are unaffected — operator controls sslmode directly."
+    apiVersion: v2
+    appVersion: v0.2.4
+    created: "2026-04-21T08:53:02.310216722Z"
+    dependencies:
+    - alias: postgresql
+      condition: postgresql.enabled
+      name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 16.2.3
+    description: Foggy - self-hosted AI-native observability for incident investigation
+    digest: c989f8a4b7702444266b5995ac4db5ed282a790d2b6b5ccc5edcb57eef9143da
+    home: https://foggyhq.com
+    icon: https://foggyhq.com/favicon.png
+    keywords:
+    - observability
+    - incident-response
+    - ai
+    - kubernetes
+    - sre
+    kubeVersion: '>=1.27.0-0'
+    maintainers:
+    - email: support@foggyhq.com
+      name: foggylabs
+      url: https://github.com/foggylabs
+    name: foggy
+    sources:
+    - https://github.com/foggylabs/helm-charts
+    type: application
+    urls:
+    - https://github.com/foggylabs/helm-charts/releases/download/foggy-0.2.0/foggy-0.2.0.tgz
+    version: 0.2.0
   - apiVersion: v2
     appVersion: v0.1.0
     created: "2026-04-20T11:58:33.274346603Z"
@@ -94,4 +137,4 @@ entries:
     urls:
     - https://github.com/foggylabs/helm-charts/releases/download/foggy-0.1.0/foggy-0.1.0.tgz
     version: 0.1.0
-generated: "2026-04-20T11:58:33.274358825Z"
+generated: "2026-04-21T08:53:02.310239862Z"
