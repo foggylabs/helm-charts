@@ -4,6 +4,41 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: fixed
+          description: "appVersion bumped v0.2.6 → v0.2.7 — completes the duplicate-migration fix. v0.2.6 made the SQL a no-op but dbmate still crashed on schema_migrations primary-key collision (both files shared timestamp 20260401120000). v0.2.7 renames the duplicate to 20260401120001 so dbmate records a distinct row. Fresh installs now apply cleanly and end up with the full alert-webhook schema (alert_events + webhook_tokens)."
+    apiVersion: v2
+    appVersion: v0.2.7
+    created: "2026-04-21T10:21:22.82025732Z"
+    dependencies:
+    - alias: postgresql
+      condition: postgresql.enabled
+      name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 16.2.3
+    description: Foggy - self-hosted AI-native observability for incident investigation
+    digest: 27862d172e090204e75101f863a6a3b44d1c65bdbcfb0bd18610c37f35deb326
+    home: https://foggyhq.com
+    icon: https://foggyhq.com/favicon.png
+    keywords:
+    - observability
+    - incident-response
+    - ai
+    - kubernetes
+    - sre
+    kubeVersion: '>=1.27.0-0'
+    maintainers:
+    - email: support@foggyhq.com
+      name: foggylabs
+      url: https://github.com/foggylabs
+    name: foggy
+    sources:
+    - https://github.com/foggylabs/helm-charts
+    type: application
+    urls:
+    - https://github.com/foggylabs/helm-charts/releases/download/foggy-0.2.3/foggy-0.2.3.tgz
+    version: 0.2.3
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: fixed
           description: "appVersion bumped v0.2.5 → v0.2.6 — fresh self-hosted installs no longer crash on duplicate migration `create_webhook_tokens`. The duplicate is now a no-op; alert-webhooks feature schema (alert_events + webhook_tokens tables) is created correctly. Existing installs unaffected."
     apiVersion: v2
     appVersion: v0.2.6
@@ -207,4 +242,4 @@ entries:
     urls:
     - https://github.com/foggylabs/helm-charts/releases/download/foggy-0.1.0/foggy-0.1.0.tgz
     version: 0.1.0
-generated: "2026-04-21T10:05:35.995958239Z"
+generated: "2026-04-21T10:21:22.820276765Z"
