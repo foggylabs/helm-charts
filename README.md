@@ -26,7 +26,7 @@ Full installation guide, RBAC reference, and upgrade instructions:
 
 | Chart | Version | App version | Description |
 |---|---|---|---|
-| [foggy](./charts/foggy) | `0.1.3` | `v0.1.0` | Foggy Console + Agent + optional bundled PostgreSQL |
+| [foggy](./charts/foggy) | `0.2.4` | `v0.2.7` | Foggy Console + Agent + optional bundled PostgreSQL |
 
 ## Review before installing
 
@@ -45,7 +45,7 @@ helm template foggy foggy/foggy \
   --show-only templates/serviceaccount.yaml
 ```
 
-Foggy's default Kubernetes access is **read-only** (`get`, `list`, `watch` on pods, events, logs, deployments, services, nodes, namespaces). It never accesses Secrets, never executes into pods, and never writes to your cluster. See [the RBAC page](https://docs.foggyhq.com/self-hosted/rbac) for the full permission table.
+Foggy's default Kubernetes access is **read-only** — `get`, `list`, `watch` on core workload resources (pods, pod logs, deployments, replicasets, statefulsets, daemonsets, services, endpoints, configmaps, events, nodes, namespaces). It never accesses Secrets, never executes into pods, and never writes to your cluster. See [the RBAC page](https://docs.foggyhq.com/self-hosted/rbac) for the full permission table.
 
 ## Contributing
 
