@@ -4,6 +4,9 @@
 .vscode/
 *.swp
 
+# Git worktrees (used for parallel branch development)
+.worktrees/
+
 # env file
 .env
 

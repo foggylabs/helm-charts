@@ -79,6 +79,14 @@ spec:
                 secretKeyRef:
                   name: {{ include "foggy.adminSecretName" . }}
                   key: password
+            # Self-hosted edition toggles — defaults cloud-friendly (true) in the
+            # foggy app settings, so the chart explicitly overrides to false for
+            # self-hosted deployments. SQLAdmin panel should never be exposed to
+            # end users; the demo project seeder is only useful for local dev.
+            - name: ENABLE_ADMIN_PANEL
+              value: "false"
+            - name: SEED_DEMO_PROJECT
+              value: "false"
             {{- with .Values.consoleBackend.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
