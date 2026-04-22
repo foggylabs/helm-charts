@@ -47,6 +47,10 @@ spec:
                   key: AGENT_API_TOKEN
             - name: OTEL_SERVICE_NAME
               value: foggy-agent
+            - name: SERVICE_VERSION
+              value: {{ .Chart.AppVersion | quote }}
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: {{ .Values.observability.otel.endpoint | default "" | quote }}
             - name: LOG_LEVEL
               value: INFO
             {{- with .Values.agent.extraEnv }}

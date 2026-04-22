@@ -115,6 +115,22 @@ admin:
   existingSecret: ""
 
 # =============================================================================
+# Observability (opt-in)
+# =============================================================================
+# Foggy emits OpenTelemetry traces, metrics, and logs via OTLP/gRPC when
+# `observability.otel.endpoint` is set. Default (empty) = disabled; the app's
+# init_observability early-returns on an empty endpoint so no export is
+# attempted and backend logs stay clean.
+#
+# To enable, point at your in-cluster collector, e.g.:
+#   observability:
+#     otel:
+#       endpoint: "http://otel-collector.observability.svc.cluster.local:4317"
+observability:
+  otel:
+    endpoint: ""
+
+# =============================================================================
 # PostgreSQL
 # =============================================================================
 # Two modes:
