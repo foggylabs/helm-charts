@@ -38,6 +38,8 @@ spec:
         - name: wait-for-postgres
           image: busybox:1.36
           imagePullPolicy: IfNotPresent
+          securityContext:
+            {{- include "foggy.containerSecurityContext" 65534 | nindent 12 }}
           command:
             - sh
             - -c
@@ -59,6 +61,8 @@ spec:
         - name: console-backend
           image: {{ include "foggy.image" (dict "ctx" . "image" .Values.consoleBackend.image) }}
           imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          securityContext:
+            {{- include "foggy.containerSecurityContext" 1000 | nindent 12 }}
           ports:
             - name: http
               containerPort: 8001
