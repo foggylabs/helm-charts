@@ -32,6 +32,8 @@ spec:
         - name: console-frontend
           image: {{ include "foggy.image" (dict "ctx" . "image" .Values.consoleFrontend.image) }}
           imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          securityContext:
+            {{- include "foggy.containerSecurityContext" 101 | nindent 12 }}
           ports:
             - name: http
               containerPort: {{ .Values.consoleFrontend.service.targetPort }}

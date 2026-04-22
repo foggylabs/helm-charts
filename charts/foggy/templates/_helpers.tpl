@@ -103,6 +103,32 @@ Name of the admin bootstrap Secret.
 {{- end }}
 
 {{/*
+Container-level securityContext matching the Kubernetes Pod Security Standards
+`restricted` profile. All images in this chart (foggy-agent, foggy-console-*)
+ship with a non-root USER directive, so the chart declares the restricted
+fields explicitly to document intent and satisfy admission controllers that
+enforce PSS restricted at the cluster level (common on enterprise EKS/GKE).
+
+Reference: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+
+Usage: {{ include "foggy.containerSecurityContext" 1000 | nindent 12 }}
+
+The single argument is the UID to run as:
+- 1000  — Python images (foggy-agent, foggy-console-backend — Dockerfile USER foggy)
+- 101   — nginx-unprivileged (foggy-console-frontend — image default USER)
+- 65534 — busybox nobody (wait-for-postgres initContainer)
+*/}}
+{{- define "foggy.containerSecurityContext" -}}
+runAsNonRoot: true
+runAsUser: {{ . }}
+allowPrivilegeEscalation: false
+capabilities:
+  drop: [ALL]
+seccompProfile:
+  type: RuntimeDefault
+{{- end }}
+
+{{/*
 Image reference helper. Falls back to chart appVersion when `tag` is unset.
 Usage: {{ include "foggy.image" (dict "ctx" . "image" .Values.agent.image) }}
 */}}
