@@ -47,10 +47,6 @@ helm template foggy foggy/foggy \
 
 Foggy's default Kubernetes access is **read-only** — `get`, `list`, `watch` on core workload resources (pods, pod logs, deployments, replicasets, statefulsets, daemonsets, services, endpoints, configmaps, events, nodes, namespaces). It never accesses Secrets, never executes into pods, and never writes to your cluster. See [the RBAC page](https://docs.foggyhq.com/self-hosted/rbac) for the full permission table.
 
-## Contributing
-
-Issues and PRs welcome at <https://github.com/foggylabs/helm-charts>. For bugs in the Foggy product itself (not the chart), open an issue at <https://github.com/foggylabs/foggy>.
-
 ## License
 
 Apache-2.0 — see [LICENSE](./LICENSE).
