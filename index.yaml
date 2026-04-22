@@ -3,6 +3,48 @@ entries:
   foggy:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: "appVersion bumped to v0.3.1 — bundles four audit-findings fixes (see foggylabs/foggy release v0.3.1): Playground row cleanup on self-hosted (BL-111 regression), observability opt-out default via empty OTEL_EXPORTER_OTLP_ENDPOINT, uninstall-preserves-secrets documentation, unused import cleanup."
+        - kind: added
+          description: "console-backend and agent now receive SERVICE_VERSION env injected from Chart.AppVersion, so /api/v1/config reports the real version (previously stalled at the backend Python default 0.1.0)."
+        - kind: changed
+          description: "Observability is now opt-out by default: OTEL_EXPORTER_OTLP_ENDPOINT is explicitly set to empty on both Deployments. Customers who want OTel export set observability.otel.endpoint in values.yaml or extraEnv on either service. Fixes continuous StatusCode.UNAVAILABLE log noise on vanilla installs where no collector listens."
+        - kind: fixed
+          description: "NOTES.txt printed after helm install now describes the actual v0.3.1 post-install flow (first-login → license-activate → llm-provider-setup → workspace dashboard → Connectors page in the sidebar) instead of the stale Waiting-for-Data narrative."
+      artifacthub.io/license: Apache-2.0
+    apiVersion: v2
+    appVersion: v0.3.1
+    created: "2026-04-22T14:58:57.21729263Z"
+    dependencies:
+    - alias: postgresql
+      condition: postgresql.enabled
+      name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 16.2.3
+    description: Foggy - self-hosted AI-native observability for incident investigation
+    digest: 20c9e722b1424cb8eea38b81281c7ebc9e0cb7efe6cc18f0d62fc19ee034b4f3
+    home: https://foggyhq.com
+    icon: https://foggyhq.com/favicon.png
+    keywords:
+    - observability
+    - incident-response
+    - ai
+    - kubernetes
+    - sre
+    kubeVersion: '>=1.27.0-0'
+    maintainers:
+    - email: support@foggyhq.com
+      name: foggylabs
+      url: https://github.com/foggylabs
+    name: foggy
+    sources:
+    - https://github.com/foggylabs/helm-charts
+    type: application
+    urls:
+    - https://github.com/foggylabs/helm-charts/releases/download/foggy-0.2.7/foggy-0.2.7.tgz
+    version: 0.2.7
+  - annotations:
+      artifacthub.io/changes: |
         - kind: security
           description: "All container specs (three Deployments plus the wait-for-postgres initContainer) now declare a container-level securityContext satisfying the Kubernetes Pod Security Standards restricted profile — runAsNonRoot, explicit non-zero runAsUser matching each image's Dockerfile USER directive, allowPrivilegeEscalation false, capabilities drop ALL, seccompProfile RuntimeDefault. Previously these fields were undefined, so the pods would be rejected at admission time on clusters that enforce PSS restricted (common on security-conscious EKS/GKE). No runtime behaviour change on permissive clusters."
         - kind: added
@@ -356,4 +398,4 @@ entries:
     urls:
     - https://github.com/foggylabs/helm-charts/releases/download/foggy-0.1.0/foggy-0.1.0.tgz
     version: 0.1.0
-generated: "2026-04-22T11:02:12.903723217Z"
+generated: "2026-04-22T14:58:57.217343245Z"
