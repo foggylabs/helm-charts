@@ -123,6 +123,22 @@ spec:
             {{- with .Values.consoleBackend.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+          # Startup probe guards the dbmate migration phase. The backend
+          # entrypoint runs all pending migrations before uvicorn binds, so
+          # first-ever installs on small DBs take ~2-5s, but customers with
+          # months of alert history can take 20-60s. Without a startupProbe
+          # the livenessProbe's initialDelaySeconds race would either kill
+          # the pod mid-migration (too short) or hide a genuinely stuck
+          # process for a full minute (too long). Kubernetes disables
+          # readiness/liveness while startupProbe is active — exactly the
+          # behaviour we want during migrations.
+          # 30 × 5s = 150s budget covers every migration size we've seen.
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            failureThreshold: 30
+            periodSeconds: 5
           readinessProbe:
             httpGet:
               path: /health
