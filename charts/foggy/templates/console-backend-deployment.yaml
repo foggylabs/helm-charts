@@ -72,6 +72,10 @@ spec:
               value: http://{{ include "foggy.fullname" . }}-agent:{{ .Values.agent.service.port }}
             - name: OTEL_SERVICE_NAME
               value: foggy-console-backend
+            - name: SERVICE_VERSION
+              value: {{ .Chart.AppVersion | quote }}
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: {{ .Values.observability.otel.endpoint | default "" | quote }}
             - name: LOG_LEVEL
               value: INFO
             {{- if .Values.postgresql.enabled }}

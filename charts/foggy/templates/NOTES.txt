@@ -22,17 +22,20 @@ Finish setup in four steps:
 {{- end }}
 
 3. Log in with email `admin@foggy.local` and the temporary password from step 1.
-   Foggy will walk you through:
-     - Change password + set your own admin email (the bootstrap admin account
-       is replaced on first login; subsequent logins use your chosen email)
-     - Activate your license (paste the JWT you received from Foggy — self-hosted
-       installs require an active license for mutating API calls, read-only
-       endpoints remain available)
-     - Configure your LLM provider (Anthropic API key recommended for Claude
-       models; OpenAI / Azure OpenAI / OpenRouter also supported)
+   You will be redirected through a short setup sequence; each step
+   auto-advances to the next:
+     - first-login: set your own admin email and a permanent password (the
+       bootstrap admin is replaced; subsequent logins use your chosen email)
+     - license-activate: paste the Foggy license JWT (self-hosted installs
+       require an active license for mutating API calls; read-only endpoints
+       remain available without one)
+     - llm-provider-setup: paste your Anthropic API key (OpenAI, Azure OpenAI,
+       and OpenRouter are also supported; configurable post-install)
 
-4. Connect your first data source (Kubernetes cluster, Prometheus, Grafana,
-   GitHub, Sentry, …) on the Waiting-for-Data screen.
+4. After setup you land on your workspace dashboard. Click "Connectors" in
+   the left sidebar to wire up data sources. Kubernetes is already connected
+   via the Agent pod's in-cluster ServiceAccount; add Grafana, Slack, GitHub,
+   Linear, Jira, Sentry, Prometheus, Loki, or Webhook as needed.
 
 Docs:  https://docs.foggyhq.com/self-hosted/getting-started
 RBAC:  https://docs.foggyhq.com/self-hosted/rbac
