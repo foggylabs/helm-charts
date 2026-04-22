@@ -3,6 +3,43 @@ entries:
   foggy:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: "appVersion bumped to v0.3.0 — bundles BL-104 (UI-managed LLM provider API keys, Fernet-encrypted at rest; ANTHROPIC_API_KEY env var remains a bootstrap fallback) and BL-111 (self-hosted: one license-scoped workspace per install, named from license customer_name claim). No chart template changes; existing installs upgrade cleanly via `helm upgrade foggy foggy/foggy`."
+        - kind: added
+          description: "Public /api/v1/config endpoint (BL-101) exposes edition (cloud|self_hosted) and version signals for the Console frontend; no chart config needed — edition is derived from FOGGY_ADMIN_PASSWORD presence, which the chart already sets via the foggy-admin Secret."
+    apiVersion: v2
+    appVersion: v0.3.0
+    created: "2026-04-22T09:31:55.547164292Z"
+    dependencies:
+    - alias: postgresql
+      condition: postgresql.enabled
+      name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 16.2.3
+    description: Foggy - self-hosted AI-native observability for incident investigation
+    digest: 0c271fa82eb9bb50863b8bbe54c7d9347f52b95b2796fc5c8eb55c4627ab4510
+    home: https://foggyhq.com
+    icon: https://foggyhq.com/favicon.png
+    keywords:
+    - observability
+    - incident-response
+    - ai
+    - kubernetes
+    - sre
+    kubeVersion: '>=1.27.0-0'
+    maintainers:
+    - email: support@foggyhq.com
+      name: foggylabs
+      url: https://github.com/foggylabs
+    name: foggy
+    sources:
+    - https://github.com/foggylabs/helm-charts
+    type: application
+    urls:
+    - https://github.com/foggylabs/helm-charts/releases/download/foggy-0.2.5/foggy-0.2.5.tgz
+    version: 0.2.5
+  - annotations:
+      artifacthub.io/changes: |
         - kind: fixed
           description: "console-backend now waits for Postgres before starting (initContainer, gated on postgresql.enabled=true). Fresh installs previously showed 4-5 CrashLoopBackOff cycles while backend retried TCP connections to a still-initializing Postgres pod. Recovery was eventual but looked broken in kubectl, and helm install --wait --timeout 5m could give up before self-healing completed."
         - kind: fixed
@@ -281,4 +318,4 @@ entries:
     urls:
     - https://github.com/foggylabs/helm-charts/releases/download/foggy-0.1.0/foggy-0.1.0.tgz
     version: 0.1.0
-generated: "2026-04-21T14:43:45.982390932Z"
+generated: "2026-04-22T09:31:55.547188126Z"
