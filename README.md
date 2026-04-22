@@ -26,7 +26,7 @@ Full installation guide, RBAC reference, and upgrade instructions:
 
 | Chart | Version | App version | Description |
 |---|---|---|---|
-| [foggy](./charts/foggy) | `0.2.4` | `v0.2.7` | Foggy Console + Agent + optional bundled PostgreSQL |
+| [foggy](./charts/foggy) | `0.2.5` | `v0.3.0` | Foggy Console + Agent + optional bundled PostgreSQL |
 
 ## Review before installing
 
